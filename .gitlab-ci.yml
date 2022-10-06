@@ -1,0 +1,23 @@
+variables:
+  BASE_URL: https://spiks.gitlab.io/city-service-ecosystems/city-service-ecosystems-front/
+
+pages:
+  stage: build
+  only:
+    - web
+  image: node:current-alpine
+  interruptible: true
+  script:
+    - yarn install --prefer-offline --check-files --frozen-lockfile --non-interactive --cache-folder .yarn
+    - STORYBOOK_BASE_URL=$BASE_URL yarn build-storybook-shamefully-ignoring-errors
+    - rm -rf public
+    - mv storybook-static public
+    - cp public/index.html public/404.html
+  cache:
+    policy: pull-push
+    paths:
+      - .yarn/
+      - node_modules/
+  artifacts:
+    paths:
+      - public
